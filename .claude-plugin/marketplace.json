@@ -8,53 +8,9 @@
   },
   "plugins": [
     {
-      "name": "ntfy-vox",
-      "description": "Voice of the noosphere - bidirectional ntfy integration for mobile control",
-      "version": "1.0.0",
-      "author": {
-        "name": "Thomas Pellet",
-        "email": "thomas@pellet.dev"
-      },
-      "source": "./rites/ntfy-vox",
-      "category": "productivity"
-    },
-    {
-      "name": "spirit-refresh",
-      "description": "Refresh the machine spirit - session reload utility",
-      "version": "1.0.0",
-      "author": {
-        "name": "Thomas Pellet",
-        "email": "thomas@pellet.dev"
-      },
-      "source": "./rites/spirit-refresh",
-      "category": "productivity"
-    },
-    {
-      "name": "scribe-machina",
-      "description": "The machine scribe - screenplay adaptation toolkit",
-      "version": "1.0.0",
-      "author": {
-        "name": "Thomas Pellet",
-        "email": "thomas@pellet.dev"
-      },
-      "source": "./rites/scribe-machina",
-      "category": "development"
-    },
-    {
-      "name": "lingua-antiqua",
-      "description": "Ancient tongue tools - medieval translation",
-      "version": "1.0.0",
-      "author": {
-        "name": "Thomas Pellet",
-        "email": "thomas@pellet.dev"
-      },
-      "source": "./rites/lingua-antiqua",
-      "category": "productivity"
-    },
-    {
       "name": "digitus-Dei",
       "description": "The Finger of God - divine project selection and autonomous execution",
-      "version": "1.0.0",
+      "version": "1.2.0",
       "author": {
         "name": "Thomas Pellet",
         "email": "thomas@pellet.dev"
