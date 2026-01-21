@@ -1,11 +1,11 @@
 ---
 description: Resume a specific project by ID (deterministic selection)
-allowed-tools: [Bash, Read, Write, Task, AskUserQuestion]
+allowed-tools: [Bash, Read, Write, Edit, AskUserQuestion, Skill]
 ---
 
-# /resume-project - Return to Specific Divine Work
+# /resume-project - Resume Specific Project
 
-Resume a specific project by ID, bypassing divine random selection.
+Resume a specific project by ID in the current session.
 
 ## Usage
 
@@ -21,145 +21,68 @@ Resume a specific project by ID, bypassing divine random selection.
 python3 ${CLAUDE_PLUGIN_ROOT}/scripts/registry.py get {id}
 ```
 
-**If not found:**
-```
-Project with ID "{id}" not found in the registry.
-
-Use `/list-projects` to see available projects.
-```
+**If not found:** Report error and suggest `/list-projects`.
 
 ### 2. Validate Status
 
-**Allowed statuses for resumption:**
-- `in_progress` - Continue work
-- `paused` - Resume from pause
-- `idea` - Start the project (like vibestart but deterministic)
+**Allowed:** `in_progress`, `paused`, `idea`
 
 **Not allowed:**
-- `blocked` - Must use `/vibesolve` or resolve manually first
-- `completed` - Cannot resume completed work
-- `abandoned` - Must resurrect first with `/project-status {id} idea`
+- `blocked` → Tell user to use `/vibesolve` or manually unblock
+- `completed` → Cannot resume completed work
+- `abandoned` → Must resurrect with `/project-status {id} idea` first
 
-**If blocked:**
-```
-Project "{title}" is blocked and cannot be resumed directly.
+### 3. Check Lock
 
-**Blocker:** {blocked_reason}
-
-Options:
-- `/vibesolve` - Auto-solve with divine intervention
-- `/project-status {id} in_progress` - Manually unblock (if resolved)
-```
-
-**If completed:**
-```
-Project "{title}" is already completed.
-
-Completed on: {completed_at}
-Repository: {repo_url}
-
-A completed work cannot be resumed. Consider starting a new iteration as a separate project.
-```
-
-**If abandoned:**
-```
-Project "{title}" has been abandoned.
-
-To resurrect it, run:
-`/project-status {id} idea`
-
-Then you can start it with `/vibestart` or `/resume-project {id}`.
-```
-
-### 3. Check Lock Status
-
-```bash
-# Project JSON includes locked_by field
-```
-
-**If locked:**
-```
-Project "{title}" is currently locked by another worker.
-
-**Locked by:** {locked_by}
-**Since:** {locked_at}
-
-Wait for the other worker to finish, or manually unlock with:
-`python3 ${CLAUDE_PLUGIN_ROOT}/scripts/registry.py unlock {id}`
-```
+If `locked_by` is set, warn user and offer to unlock or cancel.
 
 ### 4. Gather Context
 
-Same as `/viberesume`:
-- Read README.md, DESIGN.md, CHANGELOG.md
-- Get latest wrap-up if paused
-- Summarize recent progress
+For `in_progress` or `paused` projects:
+- Read README.md, DESIGN.md, CHANGELOG.md from project directory
+- Summarize current state
 
-### 5. Present and Confirm
+### 5. Confirm with User
 
-```
-## Resuming Divine Work
-
-**{title}**
-
-| Attribute | Value |
-|-----------|-------|
-| ID | {id} |
-| Status | {status} |
-| Started | {started_at} |
-| Repository | {repo_url} |
-
-### Context
-
-{wrap_up or recent CHANGELOG entries}
-
----
-
-Resume this work?
-```
-
-Use AskUserQuestion:
+Present project details and ask:
 - "Resume"
 - "Cancel"
 
-### 6. Lock and Launch
+### 6. Initialize (if status is `idea`)
 
-**a) If status is `idea`, initialize first:**
 ```bash
 echo '{project_json}' | python3 ${CLAUDE_PLUGIN_ROOT}/scripts/project_utils.py init
 python3 ${CLAUDE_PLUGIN_ROOT}/scripts/project_utils.py github {project_dir}
-echo '{"status": "in_progress", "started_at": "{ISO8601}"}' | python3 ${CLAUDE_PLUGIN_ROOT}/scripts/registry.py update {id}
+echo '{"status": "in_progress", "started_at": "{ISO8601}", "repo_url": "{url}"}' | python3 ${CLAUDE_PLUGIN_ROOT}/scripts/registry.py update {id}
 ```
 
-**b) Lock the project:**
+### 7. Lock Project
+
 ```bash
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/registry.py lock {id} {session_id}
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/registry.py lock {id} "current-session"
 ```
 
-**c) Launch in tmux:**
+### 8. Change to Project Directory
+
 ```bash
-tmux new-session -d -s "digitus-{id}" -c "{project_dir}"
-tmux send-keys -t "digitus-{id}" "DIGITUS_PROJECT_ID={id} claude '/ralph-loop:ralph-loop'" Enter
+cd {project_dir}
 ```
 
-### 7. Report
+### 9. Start Work
+
+Use the Skill tool to invoke ralph-loop in the current session:
 
 ```
-## Divine Work Resumed
-
-**Project:** {title}
-**Directory:** {project_dir}
-**Session:** digitus-{id}
-
-Monitor with `tmux attach -t digitus-{id}`
-
-*By your will, the work continues.*
+skill: "ralph-loop:ralph-loop"
+args: "{project_spec} --completion-promise 'MVP complete with tests passing'"
 ```
 
-## Difference from /viberesume
+The project spec from the registry becomes the ralph-loop prompt.
 
-| Aspect | /viberesume | /resume-project |
-|--------|-------------|-----------------|
-| Selection | Random (weighted) | Deterministic (by ID) |
-| Use case | "Give me something to work on" | "I want to work on this specific project" |
-| Status filter | in_progress, paused only | in_progress, paused, idea |
+### 10. On Completion
+
+When ralph-loop completes, unlock the project:
+
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/registry.py unlock {id}
+```

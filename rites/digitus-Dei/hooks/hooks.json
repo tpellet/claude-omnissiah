@@ -1,29 +1,4 @@
 {
-  "description": "Auto-lock/unlock projects based on DIGITUS_PROJECT_ID env var",
-  "hooks": {
-    "SessionStart": [
-      {
-        "matcher": "*",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 ${CLAUDE_PLUGIN_ROOT}/scripts/lock_project.py",
-            "timeout": 10
-          }
-        ]
-      }
-    ],
-    "SessionEnd": [
-      {
-        "matcher": "*",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 ${CLAUDE_PLUGIN_ROOT}/scripts/unlock_project.py",
-            "timeout": 10
-          }
-        ]
-      }
-    ]
-  }
+  "description": "digitus-Dei hooks (currently none - locking handled by commands)",
+  "hooks": {}
 }

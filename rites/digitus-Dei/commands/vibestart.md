@@ -1,11 +1,11 @@
 ---
 description: Divine selection of a new project - The Finger of God points
-allowed-tools: [Bash, Read, Write, Task, AskUserQuestion]
+allowed-tools: [Bash, Read, Write, Edit, AskUserQuestion, Skill]
 ---
 
 # /vibestart - The Finger of God Points
 
-Let divine providence select your next project from unstarted ideas, then execute it autonomously.
+Randomly select an unstarted project (weighted by priority) and begin work in the current session.
 
 ## Usage
 
@@ -17,43 +17,19 @@ Let divine providence select your next project from unstarted ideas, then execut
 
 ### 1. Divine Selection
 
-Select a random project weighted by Eisenhower priority (easy + urgent first):
-
 ```bash
 python3 ${CLAUDE_PLUGIN_ROOT}/scripts/selector.py --status=idea
 ```
 
-**If no projects available:**
-```
-No unstarted projects in the registry.
-Add one with `/new-project <brief>` and let the Finger of God guide your work.
-```
+**If no projects:** Tell user to add one with `/new-project <brief>`.
 
 ### 2. Present the Chosen Work
 
-```
-## The Finger of God Points To...
+Display project details:
+- Title, ID, priority, tech stack
+- Full specification
 
-**{title}**
-
-| Attribute | Value |
-|-----------|-------|
-| ID | {id} |
-| Urgency | {urgency}/4 |
-| Difficulty | {difficulty}/4 |
-| Tech Stack | {tech_stack} |
-| Created | {created_at} |
-
-### Specification
-
-{spec}
-
----
-
-Accept this divine assignment?
-```
-
-Use AskUserQuestion:
+Ask user:
 - "Accept and begin"
 - "Choose another" (re-roll)
 - "Cancel"
@@ -62,91 +38,42 @@ Use AskUserQuestion:
 
 On acceptance:
 
-**a) Create project directory structure:**
 ```bash
+# Create directory structure
 echo '{project_json}' | python3 ${CLAUDE_PLUGIN_ROOT}/scripts/project_utils.py init
-```
 
-This creates:
-- `{registry_dir}/{project-slug}/`
-- `README.md` (from spec)
-- `DESIGN.md` (initialized)
-- `CHANGELOG.md` (initialized)
-- `src/`, `tests/`
-- Git repository
-
-**b) Create GitHub repository:**
-```bash
+# Create GitHub repo
 python3 ${CLAUDE_PLUGIN_ROOT}/scripts/project_utils.py github {project_dir}
-```
 
-**c) Update registry:**
-```bash
+# Update registry
 echo '{"status": "in_progress", "started_at": "{ISO8601}", "repo_url": "{url}"}' | python3 ${CLAUDE_PLUGIN_ROOT}/scripts/registry.py update {id}
 ```
 
-Note: Do NOT lock the project here. The spawned session will lock it via SessionStart hook.
-
-### 4. Launch Autonomous Execution
-
-Start a new tmux session with ralph-loop, passing the project ID for automatic locking:
+### 4. Lock Project
 
 ```bash
-tmux new-session -d -s "digitus-{id}" -c "{project_dir}"
-tmux send-keys -t "digitus-{id}" "DIGITUS_PROJECT_ID={id} claude '/ralph-loop:ralph-loop'" Enter
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/registry.py lock {id} "current-session"
 ```
 
-The SessionStart hook automatically locks the project using DIGITUS_PROJECT_ID.
-When the session ends, the SessionEnd hook unlocks it.
+### 5. Change to Project Directory
 
-### 5. Report Launch
-
-```
-## Divine Work Commenced
-
-**Project:** {title}
-**Directory:** {project_dir}
-**Repository:** {repo_url}
-**Session:** digitus-{id}
-
-The work proceeds autonomously. Monitor with:
-- `tmux attach -t digitus-{id}` - Watch progress
-- `/project-status {id}` - Check status
-- `/list-projects` - View all projects
-
-When pausing, the agent will create wrap-up documentation.
-When blocked, a blocker.md will be created for `/vibesolve`.
-
-*In nomine Omnissiah.*
+```bash
+cd {project_dir}
 ```
 
-## Tools Available to Executing Agent
+### 6. Start Work
 
-The spawned agent has access to:
-- **Bash** - git, gh, build tools
-- **Read/Write/Edit** - File operations
-- **Serena** - Code inspection and navigation
-- **Task** - Subagent spawning
-- **WebFetch/WebSearch** - Documentation lookup
+Use the Skill tool to invoke ralph-loop:
 
-## Design Document Requirements
+```
+skill: "ralph-loop:ralph-loop"
+args: "{project_spec} --completion-promise 'MVP complete with tests passing'"
+```
 
-The executing agent MUST maintain:
+### 7. On Completion
 
-1. **DESIGN.md** - Append decisions as work progresses:
-   ```markdown
-   ## {date} - {decision title}
-   
-   **Context:** Why this decision was needed
-   **Decision:** What was decided
-   **Rationale:** Why this approach
-   **Alternatives considered:** What else was evaluated
-   ```
+Unlock the project:
 
-2. **CHANGELOG.md** - Append completed work:
-   ```markdown
-   ## {date} - {summary}
-   
-   - Completed: {list of completed items}
-   - Files changed: {list}
-   ```
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/registry.py unlock {id}
+```
