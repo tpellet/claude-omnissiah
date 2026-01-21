@@ -139,7 +139,7 @@ python3 ${CLAUDE_PLUGIN_ROOT}/scripts/registry.py lock {id} {session_id}
 **c) Launch in tmux:**
 ```bash
 tmux new-session -d -s "digitus-{id}" -c "{project_dir}"
-tmux send-keys -t "digitus-{id}" "DIGITUS_PROJECT_ID={id} claude '/ralph-loop'" Enter
+tmux send-keys -t "digitus-{id}" "DIGITUS_PROJECT_ID={id} claude '/ralph-loop:ralph-loop'" Enter
 ```
 
 ### 7. Report

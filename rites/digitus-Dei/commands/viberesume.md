@@ -90,7 +90,7 @@ Launch in new tmux session, passing the project ID for automatic locking:
 
 ```bash
 tmux new-session -d -s "digitus-{id}" -c "{project_dir}"
-tmux send-keys -t "digitus-{id}" "DIGITUS_PROJECT_ID={id} claude '/ralph-loop'" Enter
+tmux send-keys -t "digitus-{id}" "DIGITUS_PROJECT_ID={id} claude '/ralph-loop:ralph-loop'" Enter
 ```
 
 The SessionStart hook automatically locks the project using DIGITUS_PROJECT_ID.
