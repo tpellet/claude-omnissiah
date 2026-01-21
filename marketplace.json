@@ -1,0 +1,15 @@
+{
+  "name": "claude-omnissiah",
+  "version": "1.0.0",
+  "description": "The Omnissiah's sacred collection of machine rites",
+  "rites": [
+    {
+      "name": "digitus-Dei",
+      "path": "rites/digitus-Dei",
+      "description": "The Finger of God - divine project selection and autonomous execution",
+      "version": "1.2.0",
+      "components": ["commands", "hooks", "scripts", "tests"]
+    }
+  ],
+  "incantations": []
+}

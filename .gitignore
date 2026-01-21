@@ -1,0 +1,31 @@
+# macOS
+.DS_Store
+
+# Claude local settings
+.claude/*.local.md
+.claude/*.local.json
+*.local.md
+*.local.json
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+
+# Test outputs
+tests/output/
+.coverage
+.tox/
+.mypy_cache/
+.ruff_cache/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# MCP server config
+.serena/

@@ -1,0 +1,9 @@
+{
+  "name": "claude-omnissiah",
+  "version": "1.0.0",
+  "description": "The Omnissiah's sacred collection of machine rites - Claude Code plugin marketplace",
+  "author": {
+    "name": "Thomas Pellet",
+    "email": "thomas@pellet.dev"
+  }
+}
