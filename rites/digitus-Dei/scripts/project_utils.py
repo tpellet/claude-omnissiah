@@ -20,22 +20,22 @@ def slugify(title: str) -> str:
     return slug.strip("-")[:50]
 
 
-def get_unique_project_dir(slug: str, registry_dir: Path) -> Path:
+def get_unique_project_dir(slug: str, projects_dir: Path) -> Path:
     """Get a unique project directory, appending counter if needed."""
-    base = registry_dir / slug
+    base = projects_dir / slug
     if not base.exists():
         return base
     for i in range(2, 100):
-        candidate = registry_dir / f"{slug}-{i}"
+        candidate = projects_dir / f"{slug}-{i}"
         if not candidate.exists():
             return candidate
     raise ValueError(f"Too many projects with slug '{slug}'")
 
 
-def init_project_dir(project: Project, registry_dir: Path) -> Path:
+def init_project_dir(project: Project, projects_dir: Path) -> Path:
     """Create project directory structure."""
     slug = slugify(project.title)
-    project_dir = get_unique_project_dir(slug, registry_dir)
+    project_dir = get_unique_project_dir(slug, projects_dir)
 
     project_dir.mkdir(parents=True, exist_ok=True)
     (project_dir / "src").mkdir(exist_ok=True)
@@ -267,19 +267,19 @@ def create_github_repo(project_dir: Path) -> str | None:
         return None
 
 
-def get_project_dir(project: Project, registry_dir: Path) -> Path:
+def get_project_dir(project: Project, projects_dir: Path) -> Path:
     """Get project directory path from project.
 
     Searches for existing directory matching the slug pattern (slug, slug-2, etc.)
     since init_project_dir may have created a numbered variant on collision.
     """
     slug = slugify(project.title)
-    base = registry_dir / slug
+    base = projects_dir / slug
     if base.exists():
         return base
     # Check for numbered variants created by get_unique_project_dir
     for i in range(2, 100):
-        candidate = registry_dir / f"{slug}-{i}"
+        candidate = projects_dir / f"{slug}-{i}"
         if candidate.exists():
             return candidate
     # Fallback to base slug (directory may not exist yet)

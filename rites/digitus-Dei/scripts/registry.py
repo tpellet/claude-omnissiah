@@ -35,7 +35,7 @@ class Priority:
             raise ValueError(f"difficulty must be 1-4, got {self.difficulty}")
 
     def score(self) -> int:
-        """Lower score = higher priority (easy + urgent first)."""
+        """Higher score = higher priority (easy + urgent first)."""
         return (5 - self.urgency) + (5 - self.difficulty)
 
 

@@ -10,11 +10,11 @@ Create `~/.claude/digitus-Dei.local.md`:
 
 ```yaml
 ---
-registry_dir: /path/to/your/projects
+registry_dir: /path/to/your/projects/.digitus-dei
 ---
 ```
 
-All projects will be created as subdirectories of `registry_dir`. The registry is stored at `{registry_dir}/.digitus-registry.json`.
+The `registry_dir` points to a hidden `.digitus-dei` folder that stores the registry file. Projects are created in its **parent directory** (e.g., `/path/to/your/projects/my-project/`).
 
 ## Commands
 

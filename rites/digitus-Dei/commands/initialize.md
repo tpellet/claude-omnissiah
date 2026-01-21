@@ -34,7 +34,7 @@ Use AskUserQuestion:
 - "Use ~/Projects/.digitus-dei"
 - "Custom location"
 
-### 4. Create Config
+### 4. Create Config and Registry
 
 ```bash
 mkdir -p ~/.claude
@@ -44,6 +44,7 @@ registry_dir: {chosen_path}
 ---
 EOF
 mkdir -p {chosen_path}
+echo '[]' > {chosen_path}/.digitus-registry.json
 ```
 
 ### 5. Confirm
